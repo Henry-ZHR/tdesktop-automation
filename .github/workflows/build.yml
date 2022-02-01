@@ -33,12 +33,12 @@ jobs:
       - name: "[tdesktop] Build tdesktop"
         run: >
           docker run
-            -v $PWD:/usr/src/tdesktop
-            tdesktop:centos_env /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
-            -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
-            -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
-            -D DESKTOP_APP_USE_PACKAGED=OFF
-            -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+          -v $PWD:/usr/src/tdesktop
+          tdesktop:centos_env /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
+          -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
+          -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
+          -D DESKTOP_APP_USE_PACKAGED=OFF
+          -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
       - name: "[Arch] Build package"
         run: |
