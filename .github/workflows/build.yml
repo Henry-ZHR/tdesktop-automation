@@ -34,7 +34,8 @@ jobs:
         run: >
           docker run
           -v $PWD:/usr/src/tdesktop
-          tdesktop:centos_env /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
+          ghcr.io/telegramdesktop/tdesktop/centos_env:latest
+          /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
           -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
           -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
           -D DESKTOP_APP_USE_PACKAGED=OFF
