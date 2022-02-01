@@ -1,0 +1,14 @@
+diff --git a/Telegram/SourceFiles/history/history_item.cpp b/Telegram/SourceFiles/history/history_item.cpp
+index e04fa612f..05834b38a 100644
+--- a/Telegram/SourceFiles/history/history_item.cpp
++++ b/Telegram/SourceFiles/history/history_item.cpp
+@@ -677,7 +677,8 @@ bool HistoryItem::canStopPoll() const {
+ }
+ 
+ bool HistoryItem::forbidsForward() const {
+-	return (_flags & MessageFlag::NoForwards);
++	// return (_flags & MessageFlag::NoForwards);
++  return false;
+ }
+ 
+ bool HistoryItem::canDelete() const {

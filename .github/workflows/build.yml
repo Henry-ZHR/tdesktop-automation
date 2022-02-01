@@ -1,0 +1,53 @@
+name: Build Arch Linux Package
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: Repository of tdesktop
+        required: true
+        default: telegramdesktop/tdesktop
+      version:
+        description: Version of tdesktop
+        required: true
+        default: 3.5.0
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone self
+        uses: actions/checkout@v2
+      - name: Clone tdesktop
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repository }}
+          ref: v${{ github.event.inputs.version }}
+          path: tdesktop
+          submodules: recursive
+      - name: "[tdesktop] Apply patches"
+        run: git apply ../patches/*.patch
+        working-directory: tdesktop
+      - name: "[tdesktop] Pull docker image"
+        run: docker pull ghcr.io/telegramdesktop/tdesktop/centos_env:latest
+        # run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
+        working-directory: tdesktop
+      - name: "[tdesktop] Build tdesktop"
+        run: >
+          docker run
+            -v $PWD:/usr/src/tdesktop
+            tdesktop:centos_env /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
+            -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
+            -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
+            -D DESKTOP_APP_USE_PACKAGED=OFF
+            -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+        working-directory: tdesktop
+      - name: "[Arch] Build package"
+        run: |
+          strip -s -o arch-pkg/telegram tdesktop/out/Release/Telegram
+          docker run -v arch-pkg:/usr/src/telegram -w /usr/src/telegram archlinux arch-pkg/build.sh
+        env:
+          TDESKTOP_VERSION: ${{ github.event.inputs.version }}
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: pkg
+          path: arch-pkg/*.pkg.*
