@@ -27,14 +27,13 @@ jobs:
         run: git apply ../patches/*.patch
         working-directory: tdesktop
       - name: "[tdesktop] Pull docker image"
-        run: docker pull ghcr.io/telegramdesktop/tdesktop/centos_env:latest
-        # run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
+        run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
         working-directory: tdesktop
       - name: "[tdesktop] Build tdesktop"
         run: >
           docker run
           -v $PWD:/usr/src/tdesktop
-          ghcr.io/telegramdesktop/tdesktop/centos_env:latest
+          tdesktop:centos_env
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
           -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
           -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
