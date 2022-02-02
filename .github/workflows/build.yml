@@ -1,4 +1,3 @@
-name: Build Arch Linux Package
 on:
   workflow_dispatch:
     inputs:
@@ -11,25 +10,25 @@ on:
         required: true
         default: 3.5.0
 jobs:
-  build:
+  build-tdesktop:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone self
+      - name: Checkout self
         uses: actions/checkout@v2
-      - name: Clone tdesktop
+      - name: Checkout tdesktop
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.repository }}
           ref: v${{ github.event.inputs.version }}
           path: tdesktop
           submodules: recursive
-      - name: "[tdesktop] Apply patches"
+      - name: Apply patches
         run: git apply ../patches/*.patch
         working-directory: tdesktop
-      - name: "[tdesktop] Build docker image"
+      - name: Build docker image
         run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
         working-directory: tdesktop
-      - name: "[tdesktop] Build tdesktop"
+      - name: Build tdesktop
         run: >
           docker
           run
@@ -41,14 +40,40 @@ jobs:
           -D DESKTOP_APP_USE_PACKAGED=OFF
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
-      - name: "[arch] Build package"
+      - name: Upload tdesktop binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: tdesktop-binary
+          path: tdesktop/out/Release
+  build-arch-pkg:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      env:
+        TDESKTOP_VERSION: ${{ github.event.inputs.version }}
+    steps:
+      - name: Install & update packages
         run: |
-          strip -s -o arch-pkg/telegram tdesktop/out/Release/Telegram
-          docker run -v arch-pkg:/usr/src/tdesktop -w /usr/src/tdesktop archlinux ./build.sh
-        env:
-          TDESKTOP_VERSION: ${{ github.event.inputs.version }}
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git sudo
+      - name: Setup user for build
+        run: |
+          useradd --no-create-home --shell /bin/sh build
+          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+      - name: Checkout self
+        uses: actions/checkout@v2
+      - name: Download tdesktop binary
+        uses: actions/download-artifact@v2
+        with:
+          name: tdesktop-binary
+          path: arch-pkg
+      - name: Build package
+        run: |
+          chmod a+w $PWD
+          su --command "makepkg --syncdeps --noconfirm" build
+        working-directory: arch-pkg
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
-          name: pkg
+          name: arch-pkg
           path: arch-pkg/*.pkg.*

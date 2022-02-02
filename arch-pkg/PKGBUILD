@@ -32,7 +32,7 @@ source=(
 	telegram.desktop
 	tg.protocol
 	https://github.com/telegramdesktop/tdesktop/raw/master/Telegram/Resources/art/icon{16,32,48,64,128,256,512}.png
-	telegram
+	Telegram
 )
 
 sha256sums=(
@@ -57,7 +57,7 @@ package() {
 	install -dm755 "$pkgdir/usr/share/applications/"
 
 	# Program
-	install -Dm755 "$srcdir/telegram" "$pkgdir/usr/bin/telegram-desktop"
+	install -Dm755 "$srcdir/Telegram" "$pkgdir/usr/bin/telegram-desktop"
 
 	# Remove RPATH informations
 	chrpath --delete "$pkgdir/usr/bin/telegram-desktop"
