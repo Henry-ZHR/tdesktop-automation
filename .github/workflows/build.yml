@@ -54,13 +54,9 @@ jobs:
         TDESKTOP_VERSION: ${{ github.event.inputs.version }}
     steps:
       - name: Install & update packages
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel git sudo
+        run: pacman -Syu --noconfirm && pacman -S --noconfirm base-devel git sudo
       - name: Setup user for build
-        run: |
-          useradd --no-create-home --shell /bin/sh build
-          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+        run: 'useradd --no-create-home --shell /bin/sh build && echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers'
       - name: Checkout self
         uses: actions/checkout@v2
       - name: Download tdesktop binary
@@ -69,9 +65,7 @@ jobs:
           name: tdesktop-binary
           path: arch-pkg
       - name: Build package
-        run: |
-          chmod a+w $PWD
-          su --command "makepkg --syncdeps --noconfirm" build
+        run: 'chmod a+w $PWD && su --command "makepkg --syncdeps --noconfirm" build'
         working-directory: arch-pkg
       - name: Upload package
         uses: actions/upload-artifact@v2
