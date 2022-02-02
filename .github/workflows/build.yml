@@ -46,6 +46,7 @@ jobs:
           name: tdesktop-binary
           path: tdesktop/out/Release
   build-arch-pkg:
+    needs: build-tdesktop
     runs-on: ubuntu-latest
     container:
       image: archlinux
