@@ -1,14 +1,57 @@
+diff --git a/Telegram/SourceFiles/data/data_channel.cpp b/Telegram/SourceFiles/data/data_channel.cpp
+index a35c1e879..5ca89290b 100644
+--- a/Telegram/SourceFiles/data/data_channel.cpp
++++ b/Telegram/SourceFiles/data/data_channel.cpp
+@@ -474,7 +474,7 @@ bool ChannelData::canWrite() const {
+ }
+ 
+ bool ChannelData::allowsForwarding() const {
+-	return !(flags() & Flag::NoForwards);
++	return true;
+ }
+ 
+ bool ChannelData::canViewMembers() const {
+diff --git a/Telegram/SourceFiles/data/data_chat.cpp b/Telegram/SourceFiles/data/data_chat.cpp
+index 29324b782..b9c7d84d3 100644
+--- a/Telegram/SourceFiles/data/data_chat.cpp
++++ b/Telegram/SourceFiles/data/data_chat.cpp
+@@ -65,7 +65,7 @@ bool ChatData::canWrite() const {
+ }
+ 
+ bool ChatData::allowsForwarding() const {
+-	return !(flags() & Flag::NoForwards);
++	return true;
+ }
+ 
+ bool ChatData::canEditInformation() const {
+diff --git a/Telegram/SourceFiles/history/history_inner_widget.cpp b/Telegram/SourceFiles/history/history_inner_widget.cpp
+index fa083c223..5d183a595 100644
+--- a/Telegram/SourceFiles/history/history_inner_widget.cpp
++++ b/Telegram/SourceFiles/history/history_inner_widget.cpp
+@@ -468,12 +468,7 @@ void HistoryInner::setupSharingDisallowed() {
+ 	}
+ 	const auto chat = _peer->asChat();
+ 	const auto channel = _peer->asChannel();
+-	_sharingDisallowed = chat
+-		? Data::PeerFlagValue(chat, ChatDataFlag::NoForwards)
+-		: Data::PeerFlagValue(
+-			channel,
+-			ChannelDataFlag::NoForwards
+-		) | rpl::type_erased();
++	_sharingDisallowed = false;
+ 
+ 	auto rights = chat
+ 		? chat->adminRightsValue()
 diff --git a/Telegram/SourceFiles/history/history_item.cpp b/Telegram/SourceFiles/history/history_item.cpp
-index e04fa612f..05834b38a 100644
+index 09c714aa0..5c66b3b73 100644
 --- a/Telegram/SourceFiles/history/history_item.cpp
 +++ b/Telegram/SourceFiles/history/history_item.cpp
-@@ -677,7 +677,8 @@ bool HistoryItem::canStopPoll() const {
+@@ -762,7 +762,7 @@ bool HistoryItem::canStopPoll() const {
  }
  
  bool HistoryItem::forbidsForward() const {
 -	return (_flags & MessageFlag::NoForwards);
-+	// return (_flags & MessageFlag::NoForwards);
-+  return false;
++	return false;
  }
  
  bool HistoryItem::canDelete() const {
