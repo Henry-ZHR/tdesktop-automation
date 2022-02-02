@@ -26,12 +26,13 @@ jobs:
       - name: "[tdesktop] Apply patches"
         run: git apply ../patches/*.patch
         working-directory: tdesktop
-      - name: "[tdesktop] Pull docker image"
+      - name: "[tdesktop] Build docker image"
         run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
         working-directory: tdesktop
       - name: "[tdesktop] Build tdesktop"
         run: >
-          docker run
+          docker
+          run
           -v $PWD:/usr/src/tdesktop
           tdesktop:centos_env
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
@@ -40,7 +41,7 @@ jobs:
           -D DESKTOP_APP_USE_PACKAGED=OFF
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
-      - name: "[Arch] Build package"
+      - name: "[arch] Build package"
         run: |
           strip -s -o arch-pkg/telegram tdesktop/out/Release/Telegram
           docker run -v arch-pkg:/usr/src/telegram -w /usr/src/telegram archlinux arch-pkg/build.sh
