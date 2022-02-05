@@ -9,6 +9,10 @@ on:
         description: Version of tdesktop
         required: true
         default: 3.5.0
+      pkg_name:
+        description: Name of Archlinux package
+        required: true
+        default: tdesktop-bin
 jobs:
   build-tdesktop:
     runs-on: ubuntu-latest
@@ -23,7 +27,7 @@ jobs:
           path: tdesktop
           submodules: recursive
       - name: Apply patches
-        run: git apply ../patches/*.patch
+        run: git apply --verbose ../patches/*.patch
         working-directory: tdesktop
       - name: Build docker image
         run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
@@ -51,12 +55,11 @@ jobs:
     container:
       image: archlinux
       env:
+        PKG_NAME: ${{ github.event.inputs.pkg_name }}
         TDESKTOP_VERSION: ${{ github.event.inputs.version }}
     steps:
       - name: Install & update packages
-        run: pacman -Syu --noconfirm && pacman -S --noconfirm base-devel git sudo
-      - name: Setup user for build
-        run: 'useradd --no-create-home --shell /bin/sh build && echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers'
+        run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git sudo
       - name: Checkout self
         uses: actions/checkout@v2
       - name: Download tdesktop binary
@@ -64,8 +67,14 @@ jobs:
         with:
           name: tdesktop-binary
           path: arch-pkg
+      - name: Create user `build`
+        run: useradd --no-create-home --shell /bin/sh build
+      - name: Give user `build` sudo access
+        run: 'echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee -a /etc/sudoers'
+      - name: Make `arch-pkg` directory world-writable
+        run: chmod a+w arch-pkg
       - name: Build package
-        run: 'chmod a+w $PWD && su --command "makepkg --syncdeps --noconfirm" build'
+        run: 'su --command "makepkg --syncdeps --noconfirm" build'
         working-directory: arch-pkg
       - name: Upload package
         uses: actions/upload-artifact@v2

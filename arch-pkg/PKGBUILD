@@ -1,6 +1,6 @@
 # Modified from aur/telegram-desktop-bin
 
-pkgname=tdesktop-bin
+pkgname=$PKG_NAME
 pkgver=$TDESKTOP_VERSION
 pkgrel=1
 
