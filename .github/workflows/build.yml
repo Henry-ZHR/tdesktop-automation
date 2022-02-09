@@ -12,7 +12,7 @@ on:
       pkg_name:
         description: Name of Archlinux package
         required: true
-        default: tdesktop-bin
+        default: tdesktop
 jobs:
   build-tdesktop:
     runs-on: ubuntu-latest
@@ -30,13 +30,13 @@ jobs:
         run: git apply --verbose ../patches/*.patch
         working-directory: tdesktop
       - name: Build docker image
-        run: docker build -t tdesktop:centos_env Telegram/build/docker/centos_env/
+        run: docker build --tag tdesktop:centos_env Telegram/build/docker/centos_env/
         working-directory: tdesktop
       - name: Build tdesktop
         run: >
           docker
           run
-          -v $PWD:/usr/src/tdesktop
+          --volume $PWD:/usr/src/tdesktop
           tdesktop:centos_env
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
           -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
@@ -56,6 +56,7 @@ jobs:
       image: archlinux
       env:
         PKG_NAME: ${{ github.event.inputs.pkg_name }}
+        TDESKTOP_REPO: ${{ github.event.inputs.repository }}
         TDESKTOP_VERSION: ${{ github.event.inputs.version }}
     steps:
       - name: Install & update packages
@@ -70,7 +71,7 @@ jobs:
       - name: Create user `build`
         run: useradd --no-create-home --shell /bin/sh build
       - name: Give user `build` sudo access
-        run: 'echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee -a /etc/sudoers'
+        run: 'echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers'
       - name: Make `arch-pkg` directory world-writable
         run: chmod a+w arch-pkg
       - name: Build package
