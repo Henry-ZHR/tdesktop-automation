@@ -1,30 +1,20 @@
 name: Build
-on:
-  workflow_dispatch:
-    inputs:
-      repository:
-        description: Repository of tdesktop
-        required: true
-        default: telegramdesktop/tdesktop
-      version:
-        description: Version of tdesktop
-        required: true
-        default: 3.5.0
-      pkg_name:
-        description: Name of Archlinux package
-        required: true
-        default: tdesktop
+on: [push, workflow_dispatch]
 jobs:
   build-tdesktop:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout self
         uses: actions/checkout@v2
+      - id: get-repo
+        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
+      - id: get-version
+        run: echo "::set-output name=version::$(jq -r .version info.json)"
       - name: Checkout tdesktop
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.repository }}
-          ref: v${{ github.event.inputs.version }}
+          repository: ${{ steps.get-repo.outputs.repo }}
+          ref: v${{ steps.get-version.outputs.version }}
           path: tdesktop
           submodules: recursive
       - name: Apply patches
@@ -55,15 +45,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux
-      env:
-        PKG_NAME: ${{ github.event.inputs.pkg_name }}
-        TDESKTOP_REPO: ${{ github.event.inputs.repository }}
-        TDESKTOP_VERSION: ${{ github.event.inputs.version }}
     steps:
       - name: Install & update packages
         run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git sudo
       - name: Checkout self
         uses: actions/checkout@v2
+      - id: get-repo
+        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
+      - id: get-version
+        run: echo "::set-output name=version::$(jq -r .version info.json)"
+      - id: get-pkgname
+        run: echo "::set-output name=pkgname::$(jq -r .pkgname info.json)"
       - name: Download tdesktop binary
         uses: actions/download-artifact@v2
         with:
@@ -78,6 +70,10 @@ jobs:
       - name: Build package
         run: 'su --command "makepkg --syncdeps --noconfirm" build'
         working-directory: arch-pkg
+        env:
+          PKG_NAME: ${{ steps.get-pkgname.outputs.pkgname }}
+          TDESKTOP_REPO: ${{ steps.get-repo.outputs.repo }}
+          TDESKTOP_VERSION: ${{ steps.get-version.outputs.version }}
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
