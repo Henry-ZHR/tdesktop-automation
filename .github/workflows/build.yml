@@ -6,15 +6,14 @@ jobs:
     steps:
       - name: Checkout self
         uses: actions/checkout@v2
-      - id: get-repo
-        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
-      - id: get-version
-        run: echo "::set-output name=version::$(jq -r .version info.json)"
+      - id: get-info
+        name: Get info
+        run: for i in repo version; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
       - name: Checkout tdesktop
         uses: actions/checkout@v2
         with:
-          repository: ${{ steps.get-repo.outputs.repo }}
-          ref: v${{ steps.get-version.outputs.version }}
+          repository: ${{ steps.get-info.outputs.repo }}
+          ref: v${{ steps.get-info.outputs.version }}
           path: tdesktop
           submodules: recursive
       - name: Apply patches
@@ -50,12 +49,9 @@ jobs:
         run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git jq sudo
       - name: Checkout self
         uses: actions/checkout@v2
-      - id: get-repo
-        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
-      - id: get-version
-        run: echo "::set-output name=version::$(jq -r .version info.json)"
-      - id: get-pkgname
-        run: echo "::set-output name=pkgname::$(jq -r .pkgname info.json)"
+      - id: get-info
+        name: Get info
+        run: for i in repo version pkgname; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
       - name: Download tdesktop binary
         uses: actions/download-artifact@v2
         with:
@@ -71,9 +67,9 @@ jobs:
         run: 'su --command "makepkg --syncdeps --noconfirm" build'
         working-directory: arch-pkg
         env:
-          PKG_NAME: ${{ steps.get-pkgname.outputs.pkgname }}
-          TDESKTOP_REPO: ${{ steps.get-repo.outputs.repo }}
-          TDESKTOP_VERSION: ${{ steps.get-version.outputs.version }}
+          PKG_NAME: ${{ steps.get-info.outputs.pkgname }}
+          TDESKTOP_REPO: ${{ steps.get-info.outputs.repo }}
+          TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:

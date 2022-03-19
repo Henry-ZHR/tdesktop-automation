@@ -10,17 +10,21 @@ jobs:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - id: get-repo
-        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
-      - id: get-version
-        run: echo "::set-output name=version::$(jq -r .version info.json)"
+      - id: get-info
+        name: Get info
+        run: for i in repo version; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
       - id: get-latest-release
-        run: echo "::set-output name=version::$(curl --location --silent https://api.github.com/repos/${{ steps.get-repo.outputs.repo }}/releases/latest | jq -r .tag_name | sed --regexp-extended 's/v([[:digit:]]+(\.[[:digit:]]+)+)/\1/')"
-      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+        name: Get latest release
+        run: echo "::set-output name=version::$(curl --location --silent https://api.github.com/repos/${{ steps.get-info.outputs.repo }}/releases/latest | jq -r .tag_name | sed --regexp-extended 's/v([[:digit:]]+(\.[[:digit:]]+)+)/\1/')"
+      - if: steps.get-info.outputs.version != steps.get-latest-release.outputs.version
+        name: Save new version
         run: jq '.version = "${{ steps.get-latest-release.outputs.version }}"' info.json >info-new.json && mv --force info-new.json info.json
-      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+      - if: steps.get-info.outputs.version != steps.get-latest-release.outputs.version
+        name: Setup git
         run: git config user.name 'github-actions[bot]' && git config user.email 'github-actions[bot]@users.noreply.github.com'
-      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+      - if: steps.get-info.outputs.version != steps.get-latest-release.outputs.version
+        name: Commit
         run: git commit --all --message="Update version to ${{ steps.get-latest-release.outputs.version }}"
-      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+      - if: steps.get-info.outputs.version != steps.get-latest-release.outputs.version
+        name: Push to GitHub
         run: git push
