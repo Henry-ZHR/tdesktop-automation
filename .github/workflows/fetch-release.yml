@@ -1,0 +1,24 @@
+name: Fetch latest release
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+jobs:
+  fetch-latest-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: get-repo
+        run: echo "::set-output name=repo::$(jq -r .repo info.json)"
+      - id: get-version
+        run: echo "::set-output name=version::$(jq -r .version info.json)"
+      - id: get-latest-release
+        run: echo "::set-output name=version::$(curl --location --silent https://api.github.com/repos/${{ steps.get-repo.outputs.repo }}/releases/latest | jq -r .tag_name | sed --regexp-extended 's/v([[:digit:]]+(\.[[:digit:]]+)+)/\1/')"
+      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+        run: jq '.version = "${{ steps.get-latest-release.outputs.version }}"' info.json >info-new.json && mv --force info-new.json info.json
+      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+        run: git config user.name 'github-actions[bot]' && git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+        run: git commit --all --message="Update version to ${{ steps.get-latest-release.outputs.version }}"
+      - if: steps.get-version.outputs.version != steps.get-latest-release.outputs.version
+        run: git push
