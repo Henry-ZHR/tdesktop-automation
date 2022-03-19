@@ -47,7 +47,7 @@ jobs:
       image: archlinux
     steps:
       - name: Install & update packages
-        run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git sudo
+        run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git jq sudo
       - name: Checkout self
         uses: actions/checkout@v2
       - id: get-repo
