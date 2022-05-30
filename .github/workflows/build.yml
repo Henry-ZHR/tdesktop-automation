@@ -43,10 +43,10 @@ jobs:
     needs: build-tdesktop
     runs-on: ubuntu-latest
     container:
-      image: archlinux
+      image: archlinux:base-devel
     steps:
       - name: Install & update packages
-        run: pacman --sync --refresh --sysupgrade --noconfirm base-devel git jq sudo
+        run: pacman --sync --refresh --sysupgrade --noconfirm git jq
       - name: Checkout self
         uses: actions/checkout@v2
       - id: get-info
