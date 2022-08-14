@@ -19,9 +19,11 @@ jobs:
       - name: Apply patches
         run: git apply --verbose ../patches/*.patch
         working-directory: tdesktop
-      - name: Build docker image
-        run: docker build --tag tdesktop:centos_env Telegram/build/docker/centos_env/
-        working-directory: tdesktop
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Prepare libraries
+        run: poetry install && (poetry run gen_dockerfile | docker buildx build --tag tdesktop:centos_env -)
+        working-directory: tdesktop/Telegram/build/docker/centos_env
       - name: Build tdesktop
         run: >
           docker
