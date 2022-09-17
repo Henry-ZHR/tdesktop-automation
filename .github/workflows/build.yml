@@ -22,7 +22,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Prepare libraries
-        run: poetry install && (env DEBUG= poetry run gen_dockerfile | docker buildx build --tag tdesktop:centos_env -)
+        run: (env PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry install) && (env DEBUG= poetry run gen_dockerfile | docker buildx build --tag tdesktop:centos_env -)
         working-directory: tdesktop/Telegram/build/docker/centos_env
       - name: Build tdesktop
         run: >
