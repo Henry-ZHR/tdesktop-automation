@@ -1,8 +1,8 @@
 diff --git a/Telegram/SourceFiles/data/data_channel.cpp b/Telegram/SourceFiles/data/data_channel.cpp
-index a35c1e879..5ca89290b 100644
+index 4f35f4080..2249ee86b 100644
 --- a/Telegram/SourceFiles/data/data_channel.cpp
 +++ b/Telegram/SourceFiles/data/data_channel.cpp
-@@ -474,7 +474,7 @@ bool ChannelData::canWrite() const {
+@@ -565,7 +565,7 @@ bool ChannelData::canWrite(bool checkForForum) const {
  }
  
  bool ChannelData::allowsForwarding() const {
@@ -12,10 +12,10 @@ index a35c1e879..5ca89290b 100644
  
  bool ChannelData::canViewMembers() const {
 diff --git a/Telegram/SourceFiles/data/data_chat.cpp b/Telegram/SourceFiles/data/data_chat.cpp
-index 29324b782..b9c7d84d3 100644
+index 0315c0aed..2497140e0 100644
 --- a/Telegram/SourceFiles/data/data_chat.cpp
 +++ b/Telegram/SourceFiles/data/data_chat.cpp
-@@ -65,7 +65,7 @@ bool ChatData::canWrite() const {
+@@ -69,7 +69,7 @@ bool ChatData::canWrite() const {
  }
  
  bool ChatData::allowsForwarding() const {
@@ -25,10 +25,10 @@ index 29324b782..b9c7d84d3 100644
  
  bool ChatData::canEditInformation() const {
 diff --git a/Telegram/SourceFiles/history/history_inner_widget.cpp b/Telegram/SourceFiles/history/history_inner_widget.cpp
-index fa083c223..5d183a595 100644
+index c719a3ad3..288bd20c6 100644
 --- a/Telegram/SourceFiles/history/history_inner_widget.cpp
 +++ b/Telegram/SourceFiles/history/history_inner_widget.cpp
-@@ -468,12 +468,7 @@ void HistoryInner::setupSharingDisallowed() {
+@@ -518,12 +518,7 @@ void HistoryInner::setupSharingDisallowed() {
  	}
  	const auto chat = _peer->asChat();
  	const auto channel = _peer->asChannel();
@@ -43,10 +43,10 @@ index fa083c223..5d183a595 100644
  	auto rights = chat
  		? chat->adminRightsValue()
 diff --git a/Telegram/SourceFiles/history/history_item.cpp b/Telegram/SourceFiles/history/history_item.cpp
-index 09c714aa0..5c66b3b73 100644
+index a2751a6e2..71c7887b0 100644
 --- a/Telegram/SourceFiles/history/history_item.cpp
 +++ b/Telegram/SourceFiles/history/history_item.cpp
-@@ -762,7 +762,7 @@ bool HistoryItem::canStopPoll() const {
+@@ -831,15 +831,10 @@ bool HistoryItem::canStopPoll() const {
  }
  
  bool HistoryItem::forbidsForward() const {
@@ -54,4 +54,12 @@ index 09c714aa0..5c66b3b73 100644
 +	return false;
  }
  
- bool HistoryItem::canDelete() const {
+ bool HistoryItem::forbidsSaving() const {
+-	if (forbidsForward()) {
+-		return true;
+-	} else if (const auto invoice = _media ? _media->invoice() : nullptr) {
+-		return (invoice->extendedMedia != nullptr);
+-	}
+ 	return false;
+ }
+ 
