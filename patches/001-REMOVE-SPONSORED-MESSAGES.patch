@@ -1,14 +1,13 @@
 diff --git a/Telegram/SourceFiles/data/data_sponsored_messages.cpp b/Telegram/SourceFiles/data/data_sponsored_messages.cpp
-index 66adb4d0f..52cf1d315 100644
+index 011ad072d..a4a6046fd 100644
 --- a/Telegram/SourceFiles/data/data_sponsored_messages.cpp
 +++ b/Telegram/SourceFiles/data/data_sponsored_messages.cpp
-@@ -81,7 +81,8 @@ bool SponsoredMessages::append(not_null<History*> history) {
+@@ -173,7 +173,7 @@ void SponsoredMessages::inject(
  }
  
  bool SponsoredMessages::canHaveFor(not_null<History*> history) const {
 -	return history->peer->isChannel();
-+	// return history->peer->isChannel();
-+  return false;
++	return false;
  }
  
- void SponsoredMessages::request(not_null<History*> history) {
+ void SponsoredMessages::request(not_null<History*> history, Fn<void()> done) {
