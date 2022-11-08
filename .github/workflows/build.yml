@@ -21,6 +21,8 @@ jobs:
         working-directory: tdesktop
       - name: Install Poetry
         run: pip install poetry
+      - name: Create docker build instance
+        run: docker buildx create --use --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=-1 --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=-1
       - name: Prepare libraries
         run: (env PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry install) && (env DEBUG= poetry run gen_dockerfile | docker buildx build --tag tdesktop:centos_env -)
         working-directory: tdesktop/Telegram/build/docker/centos_env
