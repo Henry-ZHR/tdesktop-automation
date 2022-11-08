@@ -8,7 +8,7 @@ jobs:
         uses: actions/checkout@v2
       - id: get-info
         name: Get info
-        run: for i in repo version; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
+        run: ./get-info.sh
       - name: Checkout tdesktop
         uses: actions/checkout@v2
         with:
@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v2
       - id: get-info
         name: Get info
-        run: for i in repo version pkgname; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
+        run: ./get-info.sh
       - name: Download tdesktop binary
         uses: actions/download-artifact@v2
         with:

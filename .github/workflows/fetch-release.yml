@@ -12,10 +12,10 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - id: get-info
         name: Get info
-        run: for i in repo version; do echo "::set-output name=$i::$(jq -r .$i info.json)"; done
+        run: ./get-info.sh
       - id: get-latest-release
         name: Get latest release
-        run: echo "::set-output name=version::$(curl --location --silent https://api.github.com/repos/${{ steps.get-info.outputs.repo }}/releases/latest | jq -r .tag_name | sed --regexp-extended 's/v([[:digit:]]+(\.[[:digit:]]+)+)/\1/')"
+        run: echo "version=$(curl --location --silent https://api.github.com/repos/${{ steps.get-info.outputs.repo }}/releases/latest | jq -r .tag_name | sed --regexp-extended 's/v([[:digit:]]+(\.[[:digit:]]+)+)/\1/')" >>$GITHUB_OUTPUT
       - if: steps.get-info.outputs.version != steps.get-latest-release.outputs.version
         name: Save new version
         run: jq '.version = "${{ steps.get-latest-release.outputs.version }}"' info.json >info-new.json && mv --force info-new.json info.json
