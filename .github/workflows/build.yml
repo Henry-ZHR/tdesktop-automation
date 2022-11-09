@@ -19,14 +19,12 @@ jobs:
       - name: Apply patches
         run: git apply --verbose ../patches/*.patch
         working-directory: tdesktop
-      - name: Pull docker image
-        run: docker pull ghcr.io/telegramdesktop/tdesktop/centos_env:latest
       - name: Build tdesktop
         run: >
           docker
           run
           --volume $PWD:/usr/src/tdesktop
-          centos_env
+          ghcr.io/telegramdesktop/tdesktop/centos_env
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
           -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
           -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
