@@ -5,12 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout self
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - id: get-info
         name: Get info
         run: ./get-info.sh
       - name: Checkout tdesktop
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ steps.get-info.outputs.repo }}
           ref: v${{ steps.get-info.outputs.version }}
@@ -32,7 +32,7 @@ jobs:
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
       - name: Upload tdesktop binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: tdesktop-binary
           path: tdesktop/out/Release
@@ -45,12 +45,12 @@ jobs:
       - name: Install & update packages
         run: pacman --sync --refresh --sysupgrade --noconfirm git jq
       - name: Checkout self
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - id: get-info
         name: Get info
         run: ./get-info.sh
       - name: Download tdesktop binary
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: tdesktop-binary
           path: arch-pkg
@@ -68,7 +68,7 @@ jobs:
           TDESKTOP_REPO: ${{ steps.get-info.outputs.repo }}
           TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
       - name: Upload package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: arch-pkg
           path: arch-pkg/*.pkg.*
