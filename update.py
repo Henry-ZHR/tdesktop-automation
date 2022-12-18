@@ -1,0 +1,32 @@
+import json
+import subprocess
+import requests
+
+from pkg_resources import parse_version
+
+info = json.load(open('info.json', 'r'))
+repo, current_version = info['repo'], info['version']
+print('Repo:', repo)
+print('Current version:', current_version)
+
+latest_version = parse_version(
+    json.loads(
+        requests.get(f'https://api.github.com/repos/{repo}/releases/latest').
+        content)['tag_name']).base_version
+print('Latest version:', latest_version)
+
+if parse_version(latest_version) > parse_version(current_version):
+    print('Updating...')
+    info['version'] = latest_version
+    json.dump(info, open('info.json', 'w'))
+    subprocess.check_call(
+        ['git', 'config', 'user.name', 'github-actions[bot]'])
+    subprocess.check_call([
+        'git', 'config', 'user.email',
+        'github-actions[bot]@users.noreply.github.com'
+    ])
+    subprocess.check_call([
+        'git', 'commit', '--all', '--message',
+        f'Update version to {latest_version}'
+    ])
+    subprocess.check_call(['git', 'push'])
