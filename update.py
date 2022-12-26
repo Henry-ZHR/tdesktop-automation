@@ -9,11 +9,15 @@ repo, current_version = info['repo'], info['version']
 print('Repo:', repo)
 print('Current version:', current_version)
 
-latest_version = parse_version(
-    json.loads(
-        requests.get(f'https://api.github.com/repos/{repo}/releases/latest').
-        content)['tag_name']).base_version
-print('Latest version:', latest_version)
+with requests.get(f'https://api.github.com/repos/{repo}/releases/latest') as r:
+    print('::group::GitHub API response')
+    print(f'Status code: {r.status_code}')
+    print(f'Content: {r.content}')
+    print('::endgroup::')
+
+    latest_version = parse_version(json.loads(
+        r.content)['tag_name']).base_version
+    print('Latest version:', latest_version)
 
 if parse_version(latest_version) > parse_version(current_version):
     print('Updating...')
