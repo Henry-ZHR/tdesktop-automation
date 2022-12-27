@@ -12,3 +12,5 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - id: update
         run: python update.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

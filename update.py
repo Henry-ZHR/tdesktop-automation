@@ -2,14 +2,21 @@ import json
 import subprocess
 import requests
 
+from os import getenv
 from pkg_resources import parse_version
+
+github_token = getenv('GITHUB_TOKEN')
+if github_token:
+    print('Got GITHUB_TOKEN')
 
 info = json.load(open('info.json', 'r'))
 repo, current_version = info['repo'], info['version']
 print('Repo:', repo)
 print('Current version:', current_version)
 
-with requests.get(f'https://api.github.com/repos/{repo}/releases/latest') as r:
+with requests.get(f'https://api.github.com/repos/{repo}/releases/latest',
+                  headers={'authorization': f'Bearer {github_token}'}
+                  if github_token else {}) as r:
     print('::group::GitHub API response')
     print(f'Status code: {r.status_code}')
     print(f'Content: {r.content}')
