@@ -27,7 +27,7 @@ with requests.get(f'https://api.github.com/repos/{repo}/releases/latest',
     print('Latest version:', latest_version)
 
 if parse_version(latest_version) > parse_version(current_version):
-    print('Updating...')
+    print('Updating...', flush=True)
     info['version'] = latest_version
     json.dump(info, open('info.json', 'w'))
     subprocess.check_call(
