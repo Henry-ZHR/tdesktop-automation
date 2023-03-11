@@ -72,3 +72,15 @@ jobs:
         with:
           name: arch-pkg
           path: arch-pkg/*.pkg.*
+  notify:
+    needs: build-arch-pkg
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependency
+        run: pip install python-telegram-bot
+      - name: Notify
+        run: python notify.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
