@@ -78,6 +78,9 @@ jobs:
     steps:
       - name: Checkout self
         uses: actions/checkout@v3
+      - id: get-info
+        name: Get info
+        run: ./get-info.sh
       - name: Install dependency
         run: pip install python-telegram-bot
       - name: Notify
