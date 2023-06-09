@@ -29,6 +29,7 @@ jobs:
           -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
           -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
           -D DESKTOP_APP_USE_PACKAGED=OFF
+          -D DESKTOP_APP_USE_PACKAGED_FONTS=ON
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
       - name: Upload tdesktop binary
