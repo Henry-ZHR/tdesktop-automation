@@ -1,5 +1,7 @@
 name: Build
-on: [push, workflow_dispatch]
+on: 
+  - push
+  - workflow_dispatch
 jobs:
   build-tdesktop:
     runs-on: ubuntu-latest
@@ -33,7 +35,7 @@ jobs:
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
         working-directory: tdesktop
       - name: Upload tdesktop binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tdesktop-binary
           path: tdesktop/out/Release
@@ -51,7 +53,7 @@ jobs:
         name: Get info
         run: ./get-info.sh
       - name: Download tdesktop binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tdesktop-binary
           path: arch-pkg
@@ -69,7 +71,7 @@ jobs:
           TDESKTOP_REPO: ${{ steps.get-info.outputs.repo }}
           TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
       - name: Upload package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: arch-pkg
           path: arch-pkg/*.pkg.*
