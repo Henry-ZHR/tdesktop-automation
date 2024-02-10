@@ -25,6 +25,7 @@ jobs:
         run: >
           docker
           run
+          --env CONFIG=Release
           --volume $PWD:/usr/src/tdesktop
           ghcr.io/telegramdesktop/tdesktop/centos_env
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
