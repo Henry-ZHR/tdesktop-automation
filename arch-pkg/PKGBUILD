@@ -3,19 +3,11 @@
 pkgname=$PKG_NAME
 pkgver=$TDESKTOP_VERSION
 pkgrel=1
-
 pkgdesc="Official desktop version of Telegram messaging app - Static binaries"
 arch=(x86_64)
-url="https://desktop.telegram.org"
+url="https://github.com/telegramdesktop/tdesktop"
 license=(GPL3)
-
-depends=(
-  desktop-file-utils
-  glib2
-  hicolor-icon-theme
-  libdbus
-  libx11
-)
+depends=(fontconfig glib2 hicolor-icon-theme glibc libx11 freetype2)
 makedepends=(
   chrpath
 )
@@ -24,12 +16,12 @@ optdepends=(
   'libappindicator-gtk3: to hide Telegram in the tray bar in GTK3-based desktop environment'
   'xdg-utils: for automatic opening of URLs, files and directories in proper applications'
 )
-
-provides=(telegram-desktop)
 conflicts=(telegram-desktop)
+provides=(telegram-desktop)
+options=(!debug)
 
 source=(
-  telegram.desktop
+  org.telegram.desktop.desktop
   tg.protocol
   https://github.com/$TDESKTOP_REPO/raw/v$TDESKTOP_VERSION/Telegram/Resources/art/icon{16,32,48,64,128,256,512}.png
   Telegram
@@ -43,8 +35,6 @@ sha256sums=(
 )
 
 package() {
-  cd "$srcdir/"
-
   # Creating needed directories
   install -dm755 "$pkgdir/usr/bin"
   install -dm755 "$pkgdir/usr/share/pixmaps/"
@@ -58,7 +48,7 @@ package() {
 
   # Desktop launcher
   install -Dm644 "$srcdir/icon512.png" "$pkgdir/usr/share/pixmaps/telegram.png"
-  install -Dm644 "$srcdir/telegram.desktop" "$pkgdir/usr/share/applications/telegram.desktop"
+  install -Dm644 "$srcdir/org.telegram.desktop.desktop" "$pkgdir/usr/share/applications/org.telegram.desktop.desktop"
 
   # KDE5 & KDE4 protocol file
   install -d "$pkgdir/usr/share/kservices5"
@@ -75,6 +65,6 @@ package() {
   done
 
   # Disable the official Telegram Desktop updater
-  install -d "$pkgdir/etc/tdesktop"
-  echo "/usr/bin/telegram-desktop" >"$pkgdir/etc/tdesktop/externalupdater"
+  mkdir -p "$pkgdir/usr/share/TelegramDesktop/externalupdater.d"
+  echo "/usr/bin/telegram-desktop" >"$pkgdir/usr/share/TelegramDesktop/externalupdater.d/telegram-desktop.conf"
 }
