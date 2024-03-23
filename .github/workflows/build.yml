@@ -3,46 +3,50 @@ on:
   - push
   - workflow_dispatch
 jobs:
-  build-arch-pkg:
+  get-info:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:base-devel
     steps:
-      - name: Install dependencies
-        run: pacman --sync --refresh --sysupgrade --needed --noconfirm git python
       - name: Checkout self
         uses: actions/checkout@v4
       - id: get-info
         name: Get info
         run: python get-info.py
-      - name: Checkout pkg
-        run: |
-          set -x
-          git clone ${{ steps.get-info.outputs.url }} pkg
-          git -C pkg reset --hard ${{ steps.get-info.outputs.commit }}
-      - name: Apply pkg patch
-        working-directory: pkg
-        run: git apply --verbose ../patches/pkg/*.patch
-      - name: Setup user for build
-        run: |
-          set -x
-          useradd --no-create-home --shell /bin/sh build
-          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers
-      - name: Make `pkg` directory world-writable
-        run: chmod a+w pkg
-      - name: Build package
-        working-directory: pkg
-        run: 'su --command "makepkg --syncdeps --noconfirm" build'
+    outputs:
+      url: ${{ steps.get-info.outputs.url }}
+      commit: ${{ steps.get-info.outputs.commit }}
+  build-arch-pkg:
+    needs: get-info
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@v10
+        with:
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+          remove-docker-images: true
+      - name: Checkout self
+        uses: actions/checkout@v4
+      - name: Build
+        run: >
+          docker run
+            --pull always
+            --env URL=${{ needs.get-info.outputs.url }}
+            --env COMMIT=${{ needs.get-info.outputs.commit }}
+            --mount type=bind,src=$(pwd),dst=/mnt/repo
+            --workdir /mnt/repo
+            archlinux:base-devel
+            ./build.sh
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: arch-pkg
           path: pkg/*.pkg.*
-    outputs:
-      url: ${{ steps.get-info.outputs.url }}
-      commit: ${{ steps.get-info.outputs.commit }}
   notify:
-    needs: build-arch-pkg
+    needs:
+      - get-info
+      - build-arch-pkg
     runs-on: ubuntu-latest
     steps:
       - name: Checkout self
@@ -58,6 +62,6 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
-          URL: ${{ needs.build-arch-pkg.outputs.url }}
-          COMMIT: ${{ needs.build-arch-pkg.outputs.commit }}
+          URL: ${{ needs.get-info.outputs.url }}
+          COMMIT: ${{ needs.get-info.outputs.commit }}
           SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
