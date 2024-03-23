@@ -12,6 +12,11 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Install dependency
-        run: sudo apt-get --assume-yes install python3-git 
+        run: |
+          set -x
+          sudo apt-get update
+          sudo apt-get --assume-yes dist-upgrade
+          sudo apt-get --assume-yes install python3-git 
       - name: Check for update
-        run: python update.py
+        shell: python
+        run: update.py

@@ -14,16 +14,21 @@ jobs:
         uses: actions/checkout@v4
       - id: get-info
         name: Get info
-        run: python get-info.py
+        shell: python
+        run: get-info.py
       - name: Checkout pkg
-        run: git clone ${{ steps.get-info.outputs.url }} pkg && git -C pkg reset --hard ${{ steps.get-info.outputs.commit }}
+        run: |
+          set -x
+          git clone ${{ steps.get-info.outputs.url }} pkg
+          git -C pkg reset --hard ${{ steps.get-info.outputs.commit }}
       - name: Apply pkg patch
         working-directory: pkg
         run: git apply --verbose ../patches/pkg/*.patch
-      - name: Create user `build`
-        run: useradd --no-create-home --shell /bin/sh build
-      - name: Give user `build` sudo access
-        run: 'echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers'
+      - name: Setup user for build
+        run: |
+          set -x
+          useradd --no-create-home --shell /bin/sh build
+          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers
       - name: Make `pkg` directory world-writable
         run: chmod a+w pkg
       - name: Build package
@@ -43,10 +48,15 @@ jobs:
     steps:
       - name: Checkout self
         uses: actions/checkout@v4
-      - name: Install dependencies
-        run: sudo apt-get --assume-yes install python3-git python3-python-telegram-bot
+      - name: Install dependency
+        run: |
+          set -x
+          sudo apt-get update
+          sudo apt-get --assume-yes dist-upgrade
+          sudo apt-get --assume-yes install python3-git python3-python-telegram-bot
       - name: Notify
-        run: python notify.py
+        shell: python
+        run: notify.py
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
