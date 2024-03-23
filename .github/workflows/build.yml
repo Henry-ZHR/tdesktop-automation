@@ -18,7 +18,8 @@ jobs:
       - name: Checkout pkg
         run: git clone ${{ steps.get-info.outputs.url }} pkg && git -C pkg reset --hard ${{ steps.get-info.outputs.commit }}
       - name: Apply pkg patch
-        run: git -C pkg apply --verbose ../patches/pkg/*.patch
+        working-directory: pkg
+        run: git apply --verbose ../patches/pkg/*.patch
       - name: Create user `build`
         run: useradd --no-create-home --shell /bin/sh build
       - name: Give user `build` sudo access
@@ -26,8 +27,8 @@ jobs:
       - name: Make `pkg` directory world-writable
         run: chmod a+w pkg
       - name: Build package
-        run: 'su --command "makepkg --syncdeps --noconfirm" build'
         working-directory: pkg
+        run: 'su --command "makepkg --syncdeps --noconfirm" build'
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
