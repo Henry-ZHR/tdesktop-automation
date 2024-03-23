@@ -7,7 +7,7 @@ info = json.load(open('info.json', 'r'))
 print('Url:', info['url'])
 print('Current commit:', info['commit'])
 
-pkg_repo = Repo.clone_from(url, 'pkg')
+pkg_repo = Repo.clone_from(info['url'], 'pkg')
 latest_commit = pkg_repo.head.commit
 print('Latest commit:', latest_commit.hexsha)
 
