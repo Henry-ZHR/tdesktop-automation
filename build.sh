@@ -26,5 +26,8 @@ chmod a+w pkg
 echo "::endgroup::"
 
 echo "::group::Build package"
-su --command "makepkg --syncdeps --noconfirm" build
+(
+  cd pkg
+  su --command "makepkg --syncdeps --noconfirm" build
+)
 echo "::endgroup::"
