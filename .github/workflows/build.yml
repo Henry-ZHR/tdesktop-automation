@@ -31,13 +31,13 @@ jobs:
       - name: Build
         run: >
           docker run
-            --pull always
-            --env URL=${{ needs.get-info.outputs.url }}
-            --env COMMIT=${{ needs.get-info.outputs.commit }}
-            --mount type=bind,src=$(pwd),dst=/mnt/repo
-            --workdir /mnt/repo
-            archlinux:base-devel
-            ./build.sh
+          --pull always
+          --env URL=${{ needs.get-info.outputs.url }}
+          --env COMMIT=${{ needs.get-info.outputs.commit }}
+          --mount type=bind,src=$(pwd),dst=/mnt/repo
+          --workdir /mnt/repo
+          archlinux:base-devel
+          ./build.sh
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
