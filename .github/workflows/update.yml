@@ -18,5 +18,4 @@ jobs:
           sudo apt-get --assume-yes dist-upgrade
           sudo apt-get --assume-yes install python3-git 
       - name: Check for update
-        shell: python
-        run: update.py
+        run: python update.py
