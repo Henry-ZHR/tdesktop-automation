@@ -1,43 +1,25 @@
 import json
-import subprocess
-import requests
 
-from os import getenv
-from pkg_resources import parse_version
-
-github_token = getenv('GITHUB_TOKEN')
-if github_token:
-    print('Got GITHUB_TOKEN')
+from git import Repo
+from git.cmd import Git
 
 info = json.load(open('info.json', 'r'))
-repo, current_version = info['repo'], info['version']
-print('Repo:', repo)
-print('Current version:', current_version)
+print('Url:', info['url'])
+print('Current commit:', info['commit'])
 
-with requests.get(f'https://api.github.com/repos/{repo}/releases/latest',
-                  headers={'authorization': f'Bearer {github_token}'}
-                  if github_token else {}) as r:
-    print('::group::GitHub API response')
-    print(f'Status code: {r.status_code}')
-    print(f'Content: {r.content}')
-    print('::endgroup::')
+pkg_repo = Repo.clone_from(url, 'pkg')
+latest_commit = pkg_repo.head.commit
+print('Latest commit:', latest_commit.hexsha)
 
-    latest_version = parse_version(json.loads(
-        r.content)['tag_name']).base_version
-    print('Latest version:', latest_version)
-
-if parse_version(latest_version) > parse_version(current_version):
-    print('Updating...', flush=True)
-    info['version'] = latest_version
+if info['commit'] != latest_commit.hexsha:
+    info['commit'] = latest_commit.hexsha
     json.dump(info, open('info.json', 'w'))
-    subprocess.check_call(
-        ['git', 'config', 'user.name', 'github-actions[bot]'])
-    subprocess.check_call([
-        'git', 'config', 'user.email',
-        'github-actions[bot]@users.noreply.github.com'
-    ])
-    subprocess.check_call([
-        'git', 'commit', '--all', '--message',
-        f'Update version to {latest_version}'
-    ])
-    subprocess.check_call(['git', 'push'])
+
+    repo = Repo()
+    with repo.config_writer() as cw:
+        cw.set_value('user', 'name', 'github-actions[bot]')
+        cw.set_value('user', 'email',
+                     'github-actions[bot]@users.noreply.github.com')
+    repo.index.add('info.json')
+    repo.index.commit('Upstream: ' + latest_commit.message)
+    repo.remote().push().raise_if_error()

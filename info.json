@@ -1,1 +1,4 @@
-{"repo": "telegramdesktop/tdesktop", "version": "4.15.2", "pkgname": "tdesktop"}
+{
+    "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/telegram-desktop.git",
+    "commit": "unknown"
+}

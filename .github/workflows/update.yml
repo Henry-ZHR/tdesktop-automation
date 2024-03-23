@@ -7,10 +7,11 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout self
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - id: update
+      - name: Install dependency
+        run: sudo apt --assume-yes install python3-git 
+      - name: Check for update
         run: python update.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

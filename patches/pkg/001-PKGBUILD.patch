@@ -1,0 +1,23 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 43ae581..1d9d56a 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -29,6 +29,8 @@ build() {
+         -DCMAKE_VERBOSE_MAKEFILE=ON \
+         -DCMAKE_INSTALL_PREFIX="/usr" \
+         -DCMAKE_BUILD_TYPE=Release \
++        -DDESKTOP_APP_USE_PACKAGED=TRUE \
++        -DDESKTOP_APP_USE_PACKAGED_FONTS=TRUE \
+         -DTDESKTOP_API_ID=611335 \
+         -DTDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c
+     cmake --build build
+@@ -37,3 +39,9 @@ build() {
+ package() {
+     DESTDIR="$pkgdir" cmake --install build
+ }
++
++prepare() {
++    cd "tdesktop-${pkgver}-full"
++    mkdir -p .git
++    git apply --verbose ../../../patches/tdesktop/*.patch
++}

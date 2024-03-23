@@ -1,96 +1,54 @@
 name: Build
-on: 
+on:
   - push
   - workflow_dispatch
 jobs:
-  build-tdesktop:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout self
-        uses: actions/checkout@v4
-      - id: get-info
-        name: Get info
-        run: ./get-info.sh
-      - name: Checkout tdesktop
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ steps.get-info.outputs.repo }}
-          ref: v${{ steps.get-info.outputs.version }}
-          path: tdesktop
-          submodules: recursive
-      - name: Apply patches
-        run: git apply --verbose ../patches/*.patch
-        working-directory: tdesktop
-      - name: Build tdesktop
-        run: >
-          docker
-          run
-          --env CONFIG=Release
-          --volume $PWD:/usr/src/tdesktop
-          ghcr.io/telegramdesktop/tdesktop/centos_env
-          /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh
-          -D TDESKTOP_API_ID=${{ secrets.TDESKTOP_API_ID }}
-          -D TDESKTOP_API_HASH=${{ secrets.TDESKTOP_API_HASH }}
-          -D DESKTOP_APP_USE_PACKAGED=OFF
-          -D DESKTOP_APP_USE_PACKAGED_FONTS=ON
-          -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
-        working-directory: tdesktop
-      - name: Upload tdesktop binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: tdesktop-binary
-          path: tdesktop/out/Release
   build-arch-pkg:
-    needs: build-tdesktop
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
     steps:
-      - name: Install & update packages
-        run: pacman --sync --refresh --sysupgrade --noconfirm git jq
+      - name: Install dependencies
+        run: pacman --sync --refresh --sysupgrade --needed --noconfirm git python
       - name: Checkout self
         uses: actions/checkout@v4
       - id: get-info
         name: Get info
-        run: ./get-info.sh
-      - name: Download tdesktop binary
-        uses: actions/download-artifact@v4
-        with:
-          name: tdesktop-binary
-          path: arch-pkg
+        run: python get-info.py
+      - name: Checkout pkg
+        run: git clone ${{ steps.get-info.outputs.url }} pkg && git -C pkg reset --hard ${{ steps.get-info.outputs.commit }}
+      - name: Apply pkg patch
+        run: git -C pkg apply --verbose ../patches/pkg/*.patch
       - name: Create user `build`
         run: useradd --no-create-home --shell /bin/sh build
       - name: Give user `build` sudo access
         run: 'echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers'
-      - name: Make `arch-pkg` directory world-writable
-        run: chmod a+w arch-pkg
+      - name: Make `pkg` directory world-writable
+        run: chmod a+w pkg
       - name: Build package
         run: 'su --command "makepkg --syncdeps --noconfirm" build'
-        working-directory: arch-pkg
-        env:
-          PKG_NAME: ${{ steps.get-info.outputs.pkgname }}
-          TDESKTOP_REPO: ${{ steps.get-info.outputs.repo }}
-          TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
+        working-directory: pkg
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: arch-pkg
-          path: arch-pkg/*.pkg.*
+          path: pkg/*.pkg.*
+    outputs:
+      url: ${{ steps.get-info.outputs.url }}
+      commit: ${{ steps.get-info.outputs.commit }}
   notify:
     needs: build-arch-pkg
     runs-on: ubuntu-latest
     steps:
       - name: Checkout self
         uses: actions/checkout@v4
-      - id: get-info
-        name: Get info
-        run: ./get-info.sh
-      - name: Install dependency
-        run: pip install python-telegram-bot
+      - name: Install dependencies
+        run: sudo apt --assume-yes install python3-git python3-python-telegram-bot
       - name: Notify
         run: python notify.py
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
-          TDESKTOP_VERSION: ${{ steps.get-info.outputs.version }}
+          URL: ${{ needs.build-arch-pkg.outputs.url }}
+          COMMIT: ${{ needs.build-arch-pkg.outputs.commit }}
           SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
