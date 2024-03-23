@@ -13,7 +13,7 @@ print('Latest commit:', latest_commit.hexsha)
 
 if info['commit'] != latest_commit.hexsha:
     info['commit'] = latest_commit.hexsha
-    json.dump(info, open('info.json', 'w'))
+    json.dump(info, open('info.json', 'w'), indent=4)
 
     repo = Repo()
     with repo.config_writer() as cw:
