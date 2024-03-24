@@ -20,7 +20,7 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@v10
         with:
-          root-reserve-mb: 8192
+          root-reserve-mb: 2048
           remove-dotnet: true
           remove-android: true
           remove-haskell: true
@@ -28,15 +28,18 @@ jobs:
           remove-docker-images: true
       - name: Checkout self
         uses: actions/checkout@v4
+      - name: Create `tmp` directory
+        run: mkdir --mode=777 tmp
       - name: Build
         run: >
           docker run
           --pull always
           --env VERSION=${{ needs.get-info.outputs.version }}
           --mount type=bind,src=$(pwd),dst=/mnt/repo
+          --mount type=bind,src=$(pwd)/tmp,dst=/tmp
           --workdir /mnt/repo
           archlinux:base-devel
-          ./build.sh
+          ./build.sh || df
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:

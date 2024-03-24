@@ -32,6 +32,6 @@ pacman --sync --needed --noconfirm python-packaging
 echo "::group::Build package"
 (
   cd pkg
-  su --command "makepkg --syncdeps --noconfirm" build
+  su --command "makepkg --syncdeps --noconfirm" build || df
 )
 echo "::endgroup::"
