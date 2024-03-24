@@ -3,12 +3,14 @@
 set -e
 export SHELLOPTS
 
-echo "::group::Install dependencies"
-pacman --sync --refresh --sysupgrade --needed --noconfirm git python
+readonly PKG_URL=https://gitlab.archlinux.org/archlinux/packaging/packages/telegram-desktop.git
+
+echo "::group::Install dependency"
+pacman --sync --refresh --sysupgrade --needed --noconfirm git
 echo "::endgroup::"
 
 echo "::group::Checkout pkg"
-git clone --branch "${VERSION}" --single-branch pkg
+git clone --branch "${VERSION}" --single-branch "${PKG_URL}" pkg
 echo "::endgroup::"
 
 echo "::group::Apply pkg patch"
