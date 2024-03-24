@@ -1,18 +1,20 @@
 import json
 
+import requests
+
 from git import Repo
-from git.cmd import Git
+
+API_URL = 'https://archlinux.org/packages/extra/x86_64/telegram-desktop/json/'
 
 info = json.load(open('info.json', 'r'))
-print('Url:', info['url'])
-print('Current commit:', info['commit'])
+print('Current version:', info['version'])
 
-pkg_repo = Repo.clone_from(info['url'], 'pkg')
-latest_commit = pkg_repo.head.commit
-print('Latest commit:', latest_commit.hexsha)
+with json.load(requests.get(API_URL).content) as content:
+    latest_version = f"{content['pkgver']}-{content['pkgrel']}"
+print('Latest version:', latest_version)
 
-if info['commit'] != latest_commit.hexsha:
-    info['commit'] = latest_commit.hexsha
+if info['version'] != latest_version:
+    info['version'] = latest_version
     json.dump(info, open('info.json', 'w'), indent=4)
 
     repo = Repo()
@@ -21,5 +23,5 @@ if info['commit'] != latest_commit.hexsha:
         cw.set_value('user', 'email',
                      'github-actions[bot]@users.noreply.github.com')
     repo.index.add('info.json')
-    repo.index.commit('Upstream: ' + latest_commit.message)
+    repo.index.commit('Upstream: ' + latest_version)
     repo.remote().push().raise_if_error()

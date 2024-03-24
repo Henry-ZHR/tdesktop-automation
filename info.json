@@ -1,4 +1,3 @@
 {
-    "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/telegram-desktop.git",
-    "commit": "abb34bb7604a6044c6047e023fd6c74adca48620"
+    "version": "4.15.0-1"
 }

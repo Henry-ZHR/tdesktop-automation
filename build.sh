@@ -8,8 +8,7 @@ pacman --sync --refresh --sysupgrade --needed --noconfirm git python
 echo "::endgroup::"
 
 echo "::group::Checkout pkg"
-git clone "${URL}" pkg
-git -C pkg reset --hard "${COMMIT}"
+git clone --branch "${VERSION}" --single-branch pkg
 echo "::endgroup::"
 
 echo "::group::Apply pkg patch"
