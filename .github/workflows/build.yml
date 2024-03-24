@@ -20,7 +20,8 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@v10
         with:
-          root-reserve-mb: 4096
+          root-reserve-mb: 8192
+          swap-size-mb: 8192
           remove-dotnet: true
           remove-android: true
           remove-haskell: true
@@ -36,7 +37,7 @@ jobs:
           --pull always
           --env VERSION=${{ needs.get-info.outputs.version }}
           --mount type=bind,src=$(pwd),dst=/mnt/repo
-          --mount type=bind,src=$(pwd)/tmp,dst=/tmp
+          --mount type=tmpfs,dst=/tmp,tmpfs-size=16G
           --workdir /mnt/repo
           archlinux:base-devel
           ./build.sh || df
