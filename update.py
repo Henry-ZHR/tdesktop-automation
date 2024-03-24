@@ -9,7 +9,7 @@ API_URL = 'https://archlinux.org/packages/extra/x86_64/telegram-desktop/json/'
 info = json.load(open('info.json', 'r'))
 print('Current version:', info['version'])
 
-with json.load(requests.get(API_URL).content) as content:
+with json.loads(requests.get(API_URL).content) as content:
     latest_version = f"{content['pkgver']}-{content['pkgrel']}"
 print('Latest version:', latest_version)
 
