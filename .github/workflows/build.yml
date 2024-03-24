@@ -38,6 +38,7 @@ jobs:
           --env VERSION=${{ needs.get-info.outputs.version }}
           --mount type=bind,src=$(pwd),dst=/mnt/repo
           --mount type=tmpfs,dst=/tmp,tmpfs-size=16G
+          --ulimit nofile=1024:524288
           --workdir /mnt/repo
           archlinux:base-devel
           ./build.sh || df
