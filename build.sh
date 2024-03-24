@@ -26,6 +26,9 @@ echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers >/dev/null
 chmod a+w pkg
 echo "::endgroup::"
 
+# TODO: remove it
+pacman --sync --needed --noconfirm python-packaging
+
 echo "::group::Build package"
 (
   cd pkg
