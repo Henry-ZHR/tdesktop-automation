@@ -27,7 +27,9 @@ chmod a+w pkg
 echo "::endgroup::"
 
 # TODO: remove it
+echo "::group::Install missing dependency"
 pacman --sync --needed --noconfirm python-packaging
+echo "::endgroup::"
 
 echo "::group::Build package"
 (
