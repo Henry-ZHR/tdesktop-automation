@@ -26,16 +26,11 @@ echo "build ALL=(ALL:ALL) NOPASSWD: ALL" | tee --append /etc/sudoers >/dev/null
 chmod a+w pkg
 echo "::endgroup::"
 
-# TODO: remove it
-# echo "::group::Install missing dependency"
-# pacman --sync --needed --noconfirm python-packaging
-# echo "::endgroup::"
-
 echo "::group::Build package"
 (
   set -x
   cd pkg
-  su --command "makepkg --syncdeps --noconfirm" build
+  su --command "nice --adjustment=10 makepkg --syncdeps --noconfirm" build
   set +x
 )
 echo "::endgroup::"
