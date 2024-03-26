@@ -29,10 +29,15 @@ jobs:
           remove-docker-images: true
       - name: Checkout self
         uses: actions/checkout@v4
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v2
       - name: Build
         run: >
           docker run
+          --cpus $(echo "$(nproc) * .9" | bc)
           --env VERSION=${{ needs.get-info.outputs.version }}
+          --memory=12g
+          --memory-swap=24g
           --mount type=bind,src=$(pwd),dst=/mnt/repo
           --pull always
           --tmpfs /tmp
