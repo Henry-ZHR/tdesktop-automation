@@ -33,7 +33,9 @@ echo "::endgroup::"
 
 echo "::group::Build package"
 (
+  set -x
   cd pkg
-  su --command "set +x && makepkg --syncdeps --noconfirm" build
+  su --command "makepkg --syncdeps --noconfirm" build
+  set +x
 )
 echo "::endgroup::"
