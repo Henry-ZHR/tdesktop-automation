@@ -34,6 +34,7 @@ jobs:
       - name: Build
         run: >
           docker run
+          --cpuset-cpus=0
           --env VERSION=${{ needs.get-info.outputs.version }}
           --memory=12g
           --memory-swap=36g

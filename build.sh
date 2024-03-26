@@ -30,7 +30,7 @@ echo "::group::Build package"
 (
   set -x
   cd pkg
-  su --command "nice --adjustment=10 makepkg --syncdeps --noconfirm" build
+  su --command "makepkg --syncdeps --noconfirm" build
   set +x
 )
 echo "::endgroup::"
