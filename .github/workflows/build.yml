@@ -59,7 +59,7 @@ jobs:
       - name: Checkout self
         uses: actions/checkout@v4
       - name: Install dependency
-        run: sudo apt-get --assume-yes install python3-python-telegram-bot
+        run: pip install --user --upgrade python-telegram-bot
       - name: Notify
         run: python notify.py
         env:
