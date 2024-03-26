@@ -27,13 +27,13 @@ chmod a+w pkg
 echo "::endgroup::"
 
 # TODO: remove it
-echo "::group::Install missing dependency"
-pacman --sync --needed --noconfirm python-packaging
-echo "::endgroup::"
+# echo "::group::Install missing dependency"
+# pacman --sync --needed --noconfirm python-packaging
+# echo "::endgroup::"
 
 echo "::group::Build package"
 (
   cd pkg
-  su --command "makepkg --syncdeps --noconfirm" build || df
+  su --command "set +x && makepkg --syncdeps --noconfirm" build
 )
 echo "::endgroup::"
