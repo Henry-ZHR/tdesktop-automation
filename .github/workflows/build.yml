@@ -32,7 +32,7 @@ jobs:
       - name: Collect Workflow Telemetry
         uses: catchpoint/workflow-telemetry-action@v2
       - name: Monitor memory usage
-        run: nohup ./monitor-memory.sh \"1h 20m\" 1s mem.txt >/dev/null &
+        run: nohup ./monitor-memory.sh "1h 20m" 1s mem.txt >/dev/null &
       - name: Build
         run: >
           docker run
