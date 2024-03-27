@@ -21,7 +21,7 @@ jobs:
         uses: easimon/maximize-build-space@v10
         with:
           root-reserve-mb: 8192
-          swap-size-mb: 32768
+          swap-size-mb: 49152
           remove-dotnet: true
           remove-android: true
           remove-haskell: true
@@ -36,15 +36,15 @@ jobs:
           docker run
           --cpuset-cpus=0
           --env VERSION=${{ needs.get-info.outputs.version }}
-          --memory=12g
-          --memory-swap=36g
           --mount type=bind,src=$(pwd),dst=/mnt/repo
           --pull always
           --tmpfs /tmp
           --ulimit nofile=1024:524288
           --workdir /mnt/repo
           archlinux:base-devel
-          ./build.sh || df
+          ./build.sh
+          ||
+          (df && exit 1)
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
