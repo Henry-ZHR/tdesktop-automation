@@ -34,8 +34,9 @@ jobs:
       - name: Build
         run: >
           docker run
-          --cpuset-cpus=0
           --env VERSION=${{ needs.get-info.outputs.version }}
+          --memory=12g
+          --memory-swap=60g
           --mount type=bind,src=$(pwd),dst=/mnt/repo
           --pull always
           --tmpfs /tmp

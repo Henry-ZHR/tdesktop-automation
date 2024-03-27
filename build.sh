@@ -30,6 +30,7 @@ echo "::group::Build package"
 (
   set -x
   cd pkg
+  export CMAKE_BUILD_PARALLEL_LEVEL=$(( $(nproc) - 1 ))
   su --command "makepkg --syncdeps --noconfirm" build
   set +x
 )
