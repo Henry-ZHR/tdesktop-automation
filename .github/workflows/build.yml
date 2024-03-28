@@ -48,6 +48,9 @@ jobs:
           ./build.sh
           ||
           (df && exit 1)
+      - name: Dump dmesg
+        if: ${{ failure() }}
+        run: sudo dmesg >dmesg.txt
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
@@ -59,6 +62,12 @@ jobs:
         with:
           name: memory
           path: mem.txt
+      - name: Upload dmesg
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmesg
+          path: dmesg.txt
   notify:
     needs:
       - get-info
