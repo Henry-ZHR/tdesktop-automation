@@ -56,7 +56,7 @@ echo "::group::Makepkg build"
 (
   set -x
   cd pkg
-  export CMAKE_BUILD_PARALLEL_LEVEL=$(( $(nproc) - 1 ))
+  # export CMAKE_BUILD_PARALLEL_LEVEL=$(( $(nproc) - 1 ))
   su --command "makepkg --noextract" builduser
 )
 echo "::endgroup::"

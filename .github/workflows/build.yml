@@ -32,16 +32,16 @@ jobs:
       - name: Collect Workflow Telemetry
         uses: catchpoint/workflow-telemetry-action@v2
       - name: Monitor memory usage
-        run: nohup ./monitor-memory.sh "1h 20m" 1s mem.txt >/dev/null &
+        run: nohup ./monitor-memory.sh 4h 1s mem.txt >/dev/null &
       - name: Set swappiness
         run: sudo sysctl --write vm.swappiness=100
       - name: Build
         run: >
           docker run
+          --cpuset-cpus=0
           --env VERSION="${{ needs.get-info.outputs.version }}"
-          --memory=12g
-          --memory-swap=60g
           --mount type=bind,src=$(pwd),dst=/mnt/repo
+          --oom-score-adj=100
           --pull always
           --tmpfs /tmp
           --workdir /mnt/repo
