@@ -17,10 +17,14 @@ echo "::group::Checkout pkg"
 git clone --branch "${VERSION}" --single-branch "${PKG_URL}" pkg
 echo "::endgroup::"
 
-echo "::group::Apply pkg patch"
+echo "::group::Apply pkg patches"
 (
+  declare -r patches=("$(pwd)"/patches/pkg/*.patch)
   cd pkg
-  git apply --verbose ../patches/pkg/*.patch 
+  for patch in ${patches[*]}
+  do
+    patch --strip=1 --input="${patch}"
+  done
 )
 echo "::endgroup::"
 
@@ -39,10 +43,12 @@ echo "::endgroup::"
 
 echo "::group::Apply tdesktop patches"
 (
-  declare -r patches_dir="$(pwd)/patches/tdesktop"
+  declare -r patches=("$(pwd)"/patches/tdesktop/*.patch)
   cd pkg/src/tdesktop-*-full
-  mkdir --parents .git
-  git apply --verbose ${patches_dir}/*.patch
+  for patch in ${patches[*]}
+  do
+    patch --strip=1 --input="${patch}"
+  done
 )
 echo "::endgroup::"
 
