@@ -33,6 +33,8 @@ jobs:
         uses: catchpoint/workflow-telemetry-action@v2
       - name: Monitor memory usage
         run: nohup ./monitor-memory.sh "1h 20m" 1s mem.txt >/dev/null &
+      - name: Set swappiness
+        run: sudo sysctl --write vm.swappiness=100
       - name: Build
         run: >
           docker run
