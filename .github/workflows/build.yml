@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: >
           docker run
-          --env PKGVER="${{ needs.get-info.outputs.version }}"
+          --env VERSION="${{ needs.get-info.outputs.version }}"
           --memory=12g
           --memory-swap=60g
           --mount type=bind,src=$(pwd),dst=/mnt/repo

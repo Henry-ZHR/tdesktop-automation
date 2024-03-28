@@ -14,7 +14,7 @@ cp --force --verbose /usr/share/devtools/makepkg.conf.d/x86_64.conf /etc/makepkg
 echo "::endgroup::"
 
 echo "::group::Checkout pkg"
-git clone --branch "${PKGVER}" --single-branch "${PKG_URL}" pkg
+git clone --branch "${VERSION}" --single-branch "${PKG_URL}" pkg
 echo "::endgroup::"
 
 echo "::group::Apply pkg patch"
@@ -40,7 +40,7 @@ echo "::endgroup::"
 echo "::group::Apply tdesktop patches"
 (
   declare -r patches_dir="$(pwd)/patches/tdesktop"
-  cd "pkg/src/tdesktop-${PKGVER}-full"
+  cd pkg/src/tdesktop-*-full
   mkdir --parents .git
   git apply --verbose ${patches_dir}/*.patch
 )
