@@ -1,0 +1,8 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 66d43d5..c101b5f 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -31,2 +31,3 @@ build() {
+         -DCMAKE_BUILD_TYPE=Release \
++        -DDESKTOP_APP_USE_PACKAGED_FONTS=TRUE \
+         -DTDESKTOP_API_ID=611335 \

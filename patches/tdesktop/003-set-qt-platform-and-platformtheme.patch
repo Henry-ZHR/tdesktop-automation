@@ -1,0 +1,16 @@
+diff --git a/Telegram/SourceFiles/core/launcher.cpp b/Telegram/SourceFiles/core/launcher.cpp
+index 0b6afb7aa..1105248a4 100644
+--- a/Telegram/SourceFiles/core/launcher.cpp
++++ b/Telegram/SourceFiles/core/launcher.cpp
+@@ -61,6 +61,11 @@ FilteredCommandLineArguments::FilteredCommandLineArguments(
+ 		pushArgument(argv[i]);
+ 	}
+ 
++	pushArgument("-platform");
++	pushArgument("xcb");
++	pushArgument("-platformtheme");
++	pushArgument("xdgdesktopportal");
++
+ #if defined Q_OS_WIN || defined Q_OS_MAC
+ 	if (OptionFreeType.value()) {
+ 		pushArgument("-platform");

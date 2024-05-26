@@ -1,0 +1,121 @@
+name: Build
+on:
+  - push
+  - workflow_dispatch
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - name: Checkout self
+        uses: actions/checkout@v4
+      - id: get-version
+        name: Get version
+        run: |
+          set -o xtrace
+          echo "version=$(cat version.txt)" >>"${GITHUB_OUTPUT}"
+  build-arch-pkg:
+    needs: get-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v2
+        with:
+          proc_trace_chart_show: false
+          proc_trace_table_show: false
+      - name: Setup swap
+        uses: pierotofy/set-swap-space@v1.0
+        with:
+          swap-size-gb: 16
+      - name: Setup directories
+        run: |
+          set -o xtrace
+          sudo mkdir --parents --verbose /mnt/repro /var/lib/repro
+          sudo mount --bind /mnt/repro /var/lib/repro
+          sudo df --human-readable
+          sudo mount
+      - name: Install dependencies
+        run: sudo apt-get --assume-yes install asciidoc systemd-container
+      - name: Checkout archlinux-repro
+        uses: actions/checkout@v4
+        with:
+          repository: archlinux/archlinux-repro
+          ref: 7b770b73a2f478bc2f6da0d6f7f095e4ee1e79bf
+          path: archlinux-repro
+      - name: Install archlinux-repro
+        run: sudo make install
+        working-directory: archlinux-repro
+      - name: Checkout self
+        uses: actions/checkout@v4
+      - name: Install systemd-nspawn-wrapper
+        run: sudo install -D --mode=755 --verbose scripts/build/systemd-nspawn-wrapper.sh /usr/local/sbin/systemd-nspawn
+      - name: Download and process pkg source
+        run: scripts/build/get-source.sh
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
+      - name: Download and process pkg binary
+        run: scripts/build/get-binary.sh
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /mnt/pkg/cache
+          key: archlinux-pkgs-${{ github.run_id }}
+          restore-keys: archlinux-pkgs
+      - name: Ensure directories
+        run: |
+          set -o xtrace
+          mkdir --parent --verbose /mnt/pkg/cache
+          chmod --verbose a+w /mnt/pkg /mnt/pkg/cache
+      - name: Build with archlinux-repro
+        run: sudo archlinux-repro -f *.pkg.* || (( $? == 1 ))
+        working-directory: /mnt/pkg
+      - if: failure()
+        name: Dump dmesg
+        run: sudo dmesg >dmesg.txt
+      - if: failure()
+        name: Upload dmesg
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmesg
+          path: dmesg.txt
+      - if: success() || failure()
+        name: Get disk usage
+        run: sudo df --human-readable
+      - if: success() || failure()
+        name: Save cache
+        uses: actions/cache/save@v4
+        with:
+          path: /mnt/pkg/cache
+          key: archlinux-pkgs-${{ github.run_id }}
+      - name: Upload pkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg
+          path: |
+            /mnt/pkg/build/*.pkg.*
+            !/mnt/pkg/build/*-debug-*.pkg.*
+      - name: Upload debug pkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-pkg
+          path: /mnt/pkg/build/*-debug-*.pkg.*
+  notify:
+    needs:
+      - get-version
+      - build-arch-pkg
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout self
+        uses: actions/checkout@v4
+      - name: Install dependency
+        run: pip install --user --upgrade python-telegram-bot
+      - name: Notify
+        run: python scripts/notify.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          VERSION: ${{ needs.get-version.outputs.version }}
+          SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

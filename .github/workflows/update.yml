@@ -1,0 +1,19 @@
+name: Update
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    container: archlinux:base
+    steps:
+      - name: Install dependencies
+        run: pacman --sync --sysupgrade --refresh --needed --noconfirm git jq
+      - name: Checkout self
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
+      - name: Check for update
+        run: scripts/update.sh
