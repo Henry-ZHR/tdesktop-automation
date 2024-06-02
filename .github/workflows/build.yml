@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: archlinux/archlinux-repro
-          ref: 7b770b73a2f478bc2f6da0d6f7f095e4ee1e79bf
+          ref: 20240527
           path: archlinux-repro
       - name: Install archlinux-repro
         run: sudo make install
