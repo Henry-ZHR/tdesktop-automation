@@ -36,7 +36,10 @@ jobs:
           sudo df --human-readable
           sudo mount
       - name: Install dependencies
-        run: sudo apt-get --assume-yes install asciidoc systemd-container
+        run: |
+          set -o xtrace
+          sudo apt-get update
+          sudo apt-get --assume-yes install asciidoc systemd-container
       - name: Checkout archlinux-repro
         uses: actions/checkout@v4
         with:
