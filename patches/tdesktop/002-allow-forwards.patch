@@ -1,8 +1,8 @@
 diff --git a/Telegram/SourceFiles/data/data_channel.cpp b/Telegram/SourceFiles/data/data_channel.cpp
-index b088be2d7..1fdd73385 100644
+index 2f7694395..f9a02f133 100644
 --- a/Telegram/SourceFiles/data/data_channel.cpp
 +++ b/Telegram/SourceFiles/data/data_channel.cpp
-@@ -594,7 +594,7 @@ bool ChannelData::canAddAdmins() const {
+@@ -607,7 +607,7 @@ bool ChannelData::canAddAdmins() const {
  }
  
  bool ChannelData::allowsForwarding() const {
@@ -12,10 +12,10 @@ index b088be2d7..1fdd73385 100644
  
  bool ChannelData::canViewMembers() const {
 diff --git a/Telegram/SourceFiles/data/data_chat.cpp b/Telegram/SourceFiles/data/data_chat.cpp
-index 1e19a00d1..904859160 100644
+index 76aa1f714..f1e8ba95b 100644
 --- a/Telegram/SourceFiles/data/data_chat.cpp
 +++ b/Telegram/SourceFiles/data/data_chat.cpp
-@@ -64,7 +64,7 @@ ChatAdminRightsInfo ChatData::defaultAdminRights(not_null<UserData*> user) {
+@@ -65,7 +65,7 @@ ChatAdminRightsInfo ChatData::defaultAdminRights(not_null<UserData*> user) {
  }
  
  bool ChatData::allowsForwarding() const {
@@ -25,10 +25,10 @@ index 1e19a00d1..904859160 100644
  
  bool ChatData::canEditInformation() const {
 diff --git a/Telegram/SourceFiles/history/history_inner_widget.cpp b/Telegram/SourceFiles/history/history_inner_widget.cpp
-index b450b3f43..52255d916 100644
+index 1a302bd10..76bcbbeaa 100644
 --- a/Telegram/SourceFiles/history/history_inner_widget.cpp
 +++ b/Telegram/SourceFiles/history/history_inner_widget.cpp
-@@ -508,12 +508,7 @@ void HistoryInner::setupSharingDisallowed() {
+@@ -527,12 +527,7 @@ void HistoryInner::setupSharingDisallowed() {
  	}
  	const auto chat = _peer->asChat();
  	const auto channel = _peer->asChannel();
@@ -43,10 +43,10 @@ index b450b3f43..52255d916 100644
  	auto rights = chat
  		? chat->adminRightsValue()
 diff --git a/Telegram/SourceFiles/history/history_item.cpp b/Telegram/SourceFiles/history/history_item.cpp
-index 80a19453e..080594005 100644
+index d9c306013..8dc887937 100644
 --- a/Telegram/SourceFiles/history/history_item.cpp
 +++ b/Telegram/SourceFiles/history/history_item.cpp
-@@ -2154,15 +2154,10 @@ bool HistoryItem::canStopPoll() const {
+@@ -2239,15 +2239,10 @@ bool HistoryItem::canStopPoll() const {
  }
  
  bool HistoryItem::forbidsForward() const {
@@ -58,7 +58,7 @@ index 80a19453e..080594005 100644
 -	if (forbidsForward()) {
 -		return true;
 -	} else if (const auto invoice = _media ? _media->invoice() : nullptr) {
--		return (invoice->extendedMedia != nullptr);
+-		return HasExtendedMedia(*invoice);
 -	}
  	return false;
  }
