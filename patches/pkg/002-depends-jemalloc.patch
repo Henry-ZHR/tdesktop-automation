@@ -1,0 +1,10 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 1f3059e..80c8f98 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -38,3 +38,5 @@ build() {
+ package() {
+     DESTDIR="$pkgdir" cmake --install build
+ }
++
++depends+=('jemalloc')
