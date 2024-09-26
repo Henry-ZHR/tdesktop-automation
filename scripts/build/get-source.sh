@@ -21,8 +21,8 @@ repo_dir=$(pwd)
     patch --strip=1 --input="${patch}"
   done
 
-  sed -i 's/prepare/_prepare' PKGBUILD
-  cat "MAGIC=\"${MAGIC}\"" >> PKGBUILD
+  sed -i 's/prepare/_prepare/' PKGBUILD
+  echo "MAGIC=\"${MAGIC}\"" >>PKGBUILD
   cat >>PKGBUILD <<'EOF'
 prepare() {
   if declare -f _prepare >/dev/null
