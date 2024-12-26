@@ -24,24 +24,28 @@ jobs:
         VERSION: ${{ needs.get-version.outputs.version }}
       volumes:
         - /mnt:/mnt
-        - /mnt/cache:/var/cache
     defaults:
       run:
         shell: bash -ex {0}
-        working-directory: /mnt
+        working-directory: /mnt/work
     steps:
+      - name: Create working directory
+        working-directory: /mnt
+        run: mkdir work
       - name: Show disk usage
         run: df --human-readable
-      - name: Install dependencies
-        run: pacman -Syu --noconfirm devtools git python
-      - name: Restore cache
+      - name: Restore pkg cache
         uses: actions/cache/restore@v4
         with:
           path: /var/cache/pacman/pkg
           key: archlinux-pkgs-${{ github.run_id }}
           restore-keys: archlinux-pkgs-
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm devtools git python
       - name: Checkout self
         uses: actions/checkout@v4
+        with:
+          path: /mnt/work
       - name: Prepare packages
         run: python scripts/build/prepare-packages.py
       - name: Setup makepkg.conf
@@ -60,16 +64,16 @@ jobs:
         with:
           name: pkg
           path: |
-            /mnt/telegram-desktop/*.pkg.*
-            !/mnt/telegram-desktop/*-debug-*.pkg.*
+            /mnt/work/telegram-desktop/*.pkg.*
+            !/mnt/work/telegram-desktop/*-debug-*.pkg.*
           if-no-files-found: error
       - name: Upload debug pkg
         uses: actions/upload-artifact@v4
         with:
           name: debug-pkg
-          path: /mnt/telegram-desktop/*-debug-*.pkg.*
+          path: /mnt/work/telegram-desktop/*-debug-*.pkg.*
       - if: success() || failure()
-        name: Save cache
+        name: Save pkg cache
         uses: actions/cache/save@v4
         with:
           path: /var/cache/pacman/pkg
