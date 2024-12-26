@@ -13,12 +13,12 @@ def get_url(pkg: str, ver: str):
 
 @retry(stop=stop_after_attempt(3))
 def install_pkg_by_url(pkgs: list):
-    check_call(['pacman', '-U', '--noconfirm'] + pkgs)
+    check_call(['pacman', '-Ud', '--noconfirm'] + pkgs)
 
 
 @retry(stop=stop_after_attempt(3))
 def install_pkg_by_name(pkgs: list):
-    check_call(['pacman', '-S', '--noconfirm'] + pkgs)
+    check_call(['pacman', '-Sd', '--noconfirm'] + pkgs)
 
 
 def get_target_pkg():
