@@ -41,7 +41,7 @@ jobs:
           key: archlinux-pkgs-${{ github.run_id }}
           restore-keys: archlinux-pkgs-
       - name: Install dependencies
-        run: pacman -Syu --noconfirm devtools git python
+        run: pacman -Syu --noconfirm devtools git python python-tenacity
       - name: Checkout self
         run: git clone "https://github.com/${{ github.repository }}.git" /mnt/work
       - name: Prepare packages
