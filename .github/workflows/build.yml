@@ -49,7 +49,7 @@ jobs:
       - name: Setup makepkg.conf
         run: ln -fs /usr/share/devtools/makepkg.conf.d/x86_64.conf /etc/makepkg.conf
       - name: Get PKGBUILD
-        run: pkgctl repo clone --switch="${VERSION}" telegram-desktop
+        run: pkgctl repo clone --protocol=https --switch="${VERSION}" telegram-desktop
       - name: Setup user
         run: |
           useradd builduser
