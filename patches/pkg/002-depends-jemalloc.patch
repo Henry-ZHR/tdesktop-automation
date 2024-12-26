@@ -1,0 +1,8 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 3ddfe07..b1b45f6 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -40 +40,3 @@ package() {
+ }
++
++depends+=('jemalloc')
