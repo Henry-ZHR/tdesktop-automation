@@ -6,8 +6,11 @@ do
   patch --strip=1 --input="${patch}"
 done
 makepkg --nobuild --syncdeps --noconfirm
-for patch in ../patches/tdesktop/*.patch
-do
-  patch --strip=1 --input="${patch}"
-done
+(
+  cd src/tdesktop-*-full
+  for patch in ../../../patches/tdesktop/*.patch
+  do
+    patch --strip=1 --input="${patch}"
+  done
+)
 makepkg --noextract
