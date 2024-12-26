@@ -1,5 +1,4 @@
 import os
-import urllib
 from subprocess import check_call
 
 PACKAGE = 'telegram-desktop'
@@ -11,7 +10,7 @@ def download_and_install_package(pkg, ver, install=True):
     if ver:
         check_call([
             'pacman', '-Udd' if install else '-Uddw', '--noconfirm',
-            f'https://archive.archlinux.org/packages/{pkg[0]}/{pkg}/{pkg}-{urllib.parse.quote(ver)}.pkg.tar.zst'
+            f'https://archive.archlinux.org/packages/{pkg[0]}/{pkg}/{pkg}-{ver}.pkg.tar.zst'
         ])
     else:
         check_call(
