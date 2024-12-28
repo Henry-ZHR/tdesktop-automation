@@ -16,13 +16,11 @@ def install_pkg_by_url(pkgs: list):
     check_call(['pacman', '-Ud', '--noconfirm'] + pkgs)
 
 
-@retry(stop=stop_after_attempt(3))
-def install_pkg_by_name(pkgs: list):
-    check_call(['pacman', '-Sd', '--noconfirm'] + pkgs)
-
-
 def get_target_pkg():
-    install_pkg_by_url([get_url(PACKAGE, f'{VERSION}-{ARCH}')])
+    check_call([
+        'pacman', '-Uddw', '--noconfirm',
+        get_url(PACKAGE, f'{VERSION}-{ARCH}')
+    ])
     check_call([
         'tar', '-xvf',
         f'/var/cache/pacman/pkg/{PACKAGE}-{VERSION}-{ARCH}.pkg.tar.zst',
