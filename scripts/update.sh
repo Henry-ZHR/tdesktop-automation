@@ -9,6 +9,8 @@ readonly URLS=(https://archlinux.org/packages/extra{,-testing}/x86_64/telegram-d
 
 
 update_version() {
+  curl --head --fail "https://archive.archlinux.org/packages/t/telegram-desktop/telegram-desktop-${1}-x86_64.pkg.tar.zst"
+
   echo "${1}" >version.txt
 
   git config --global --add safe.directory "$(pwd)"
