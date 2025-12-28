@@ -9,7 +9,7 @@ readonly URLS=(https://archlinux.org/packages/extra{,-testing}/x86_64/telegram-d
 
 
 update_version() {
-  if ! curl --fail --head --location "https://archive.archlinux.org/packages/t/telegram-desktop/telegram-desktop-${1}-x86_64.pkg.tar.zst"
+  if ! curl --retry 1 --retry-all-errors --fail --head --location "https://archive.archlinux.org/packages/t/telegram-desktop/telegram-desktop-${1}-x86_64.pkg.tar.zst"
   then
     echo "::notice::Failed to download pkg, don't update"
     return
@@ -30,7 +30,7 @@ current_version="$(cat version.txt)"
 
 for url in "${URLS[@]}"
 do
-  data="$(curl --fail "${url}")" || continue
+  data="$(curl --retry 1 --retry-all-errors --fail "${url}")" || continue
   pkgver="$(echo "${data}" | jq --raw-output ".pkgver")"
   pkgrel="$(echo "${data}" | jq --raw-output ".pkgrel")"
   epoch="$(echo "${data}" | jq --raw-output ".epoch")"
