@@ -11,7 +11,7 @@ jobs:
       - name: Install dependencies
         run: pacman --sync --sysupgrade --refresh --needed --noconfirm git jq
       - name: Checkout self
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0

@@ -9,7 +9,7 @@ jobs:
       version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Checkout self
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - id: get-version
         name: Get version
         run: |
@@ -35,7 +35,7 @@ jobs:
       - name: Show disk usage
         run: df --human-readable
       - name: Restore pkg cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: /var/cache/pacman/pkg
           key: archlinux-pkgs-${{ github.run_id }}
@@ -58,7 +58,7 @@ jobs:
       - name: Build
         run: sudo -u builduser scripts/build/build.sh
       - name: Upload pkg
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pkg
           path: |
@@ -66,13 +66,13 @@ jobs:
             !/mnt/work/telegram-desktop/*-debug-*.pkg.*
           if-no-files-found: error
       - name: Upload debug pkg
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: debug-pkg
           path: /mnt/work/telegram-desktop/*-debug-*.pkg.*
       - if: success() || failure()
         name: Save pkg cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: /var/cache/pacman/pkg
           key: archlinux-pkgs-${{ github.run_id }}
