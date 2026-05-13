@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: pacman -Syu --noconfirm devtools git python python-tenacity
       - name: Checkout self
-        run: git clone "https://github.com/${{ github.repository }}.git" /mnt/work
+        run: git clone --revision=${{ github.sha }} "https://github.com/${{ github.repository }}.git" /mnt/work
       - name: Prepare packages
         run: python scripts/build/prepare-packages.py
       - name: Setup makepkg.conf
