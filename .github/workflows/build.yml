@@ -32,6 +32,10 @@ jobs:
       - name: Create working directory
         working-directory: /mnt
         run: mkdir work
+      - name: Show CPU info
+        run: lscpu
+      - name: Show memory info
+        run: free --human --wide
       - name: Show disk usage
         run: df --human-readable
       - name: Restore pkg cache
