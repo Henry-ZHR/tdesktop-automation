@@ -51,7 +51,7 @@ jobs:
       - name: Prepare packages
         run: python scripts/build/prepare-packages.py
       - name: Setup makepkg.conf
-        run: ln -fs /usr/share/devtools/makepkg.conf.d/x86_64.conf /etc/makepkg.conf
+        run: cat /usr/share/devtools/makepkg.conf.d/x86_64_v3.conf patches/makepkg.conf > /etc/makepkg.conf
       - name: Get PKGBUILD
         run: pkgctl repo clone --protocol=https --switch="${VERSION}" telegram-desktop
       - name: Setup user

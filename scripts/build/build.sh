@@ -24,7 +24,7 @@ apply_patches ../patches/pkg/*.patch
 end_group
 
 start_group "makepkg prepare"
-makepkg --nobuild --syncdeps --noconfirm
+makepkg --ignorearch --nobuild --syncdeps --noconfirm
 end_group
 
 (
@@ -35,5 +35,5 @@ end_group
 )
 
 start_group "makepkg build & package"
-makepkg --noextract
+makepkg --ignorearch --noextract
 end_group
